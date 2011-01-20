@@ -17,7 +17,7 @@ module Stalkr
         end
 
         def cleanup_html(str)
-            str.gsub!(/&nbsp;/, '')
+            str.gsub!(/&nbsp;/, ' ')
             str = strip_tags(str)
             str.strip!
             str.squeeze!(" \n\r")

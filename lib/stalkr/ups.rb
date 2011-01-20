@@ -25,73 +25,44 @@ def track(id)
 
     detail_scraper = Scraper.define do
 
-        array :details
-        process "td.det-pad", :details => :text
+        array :keys
+        array :vals
+        array :lists
 
-        result :details
+        process "#trkNum", :trackingNumber => :text
+        process "#tt_spStatus", :status => :text
+        process "#fontControl dt", :keys => :text
+        process "#fontControl dd", :vals => :text
+        process "#fontControl ul.clearfix li", :lists => :text
+
+        result :keys, :vals, :trackingNumber, :status, :lists
 
     end
 
-    details_raw = detail_scraper.scrape(html)
+    details = detail_scraper.scrape(html)
 
-    details = []
-    details_raw.each { |d|
-        d.strip!
-        next if d == '&nbsp;' || d.empty?
-        details << cleanup_html(d)
-    }
-
-    obj = OpenStruct.new(:shipper => 'UPS')
-
-    if details[0] !~ /:$/ and details.length % 2 == 1 then
-        obj.info = details.shift # first line has some basic info
+    if not details.trackingNumber then
+        raise "UPS scraper failed"
     end
 
-    h = details.to_perly_hash()
+    ret = Result.new("UPS")
 
-    obj.type            = h['Type:']
-    obj.status          = h['Status:']
-    obj.service         = h['Service:']
-    obj.tracking_num    = h['Tracking Number:']
-    obj.weight          = h['Weight:']
-
-    if obj.status =~ /\n/ then
-        # can have multiline status until it's delivered
-        obj.status = obj.status.split(/\n/)[0]
+    if details.status.strip.downcase == "delivered" then
+        ret.status = DELIVERED
     end
 
-    if obj.status.downcase == 'delivered' then
-        obj.shipped_to      = h['Delivered To:']
-        obj.delivery_date   = h['Delivered On:'].split.join(' ')
-    else
-        obj.delivery_date   = h['Rescheduled Delivery:']
-        obj.shipped_date    = h['Shipped/Billed On:']
-        obj.shipped_to      = h['Shipped To:']
+    hash = {}
+    details.keys.each_with_index do |k,i|
+        hash[k] = details.vals[i]
     end
 
-    progress_scraper = Scraper.define do
-        array :progress
-        process "td.sec-pad", :progress => :text
-        result :progress
-    end
+    delivered_at = cleanup_html( hash["Delivered On:"] )
+    ret.delivered_at = DateTime.strptime( delivered_at, "%A, %m/%d/%Y at %I:%M %p" ).to_time
 
-    progress_raw = progress_scraper.scrape(html)
+    cleanup_html( details.lists[3] ) =~ /Updated: (.*?)$/
+    ret.updated_at = DateTime.strptime( $1, "%m/%d/%Y %I:%M %p" ).to_time
 
-    progress = []
-
-    progress_raw.each_index { |i|
-        next if i % 4 != 0 or i == 0
-        o = OpenStruct.new
-        o.location      = cleanup_html(progress_raw[i]).gsub(/\n/, ' ')
-        o.date          = cleanup_html(progress_raw[i+1])
-        o.local_time    = cleanup_html(progress_raw[i+2])
-        o.desc          = cleanup_html(progress_raw[i+3])
-        progress << o
-    }
-
-    obj.progress = progress
-
-    return obj
+    return ret
 
 end
 

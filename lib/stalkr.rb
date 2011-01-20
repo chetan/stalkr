@@ -8,23 +8,41 @@ end
 require 'scrapi'
 require 'htmlentities'
 require 'ostruct'
+require 'date'
 
 require 'stalkr/base'
+require 'stalkr/result'
 require 'stalkr/ups'
 require 'stalkr/usps'
 require 'stalkr/fedex'
 
+if not DateTime.new.public_methods.include? "to_time" then
+    # monkey patch DateTime to add to_time (exists in Ruby 1.9.2 and above)
+    class DateTime
+        def to_time
+          d = new_offset(0)
+          d.instance_eval do
+            Time.utc(year, mon, mday, hour, min, sec +
+                     sec_fraction)
+          end.
+              getlocal
+        end
+    end
+end
+
 module Stalkr
 
     def self.track(id)
+        shipper = nil
         if id =~ /\d{22}/ then
-            return Stalkr::USPS.new.track(id)
+            shipper = Stalkr::USPS
         elsif id =~ /^1Z/ then
-            return Stalkr::UPS.new.track(id)
+            shipper = Stalkr::UPS
         elsif id =~ /\d{20}/ or id =~ /\d{15}/ then
-            return Stalkr::FEDEX.new.track(id)
+            shipper = Stalkr::FEDEX
         end
-        raise 'Unknown shipper code'
+        raise 'Unknown shipper code' if shipper.nil?
+        return shipper.new.track(id)
     end
 
 end # module Stalkr
