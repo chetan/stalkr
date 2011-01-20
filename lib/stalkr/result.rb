@@ -1,9 +1,9 @@
 
 module Stalkr
 
-    UNKNOWN = 0
-    DELIVERED = 1
-    IN_TRANSIT = 2
+    UNKNOWN = :unknown
+    DELIVERED = :delivered
+    IN_TRANSIT = :in_transit
 
     class Result
 

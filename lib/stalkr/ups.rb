@@ -45,10 +45,15 @@ def track(id)
         raise "UPS scraper failed"
     end
 
-    ret = Result.new("UPS")
+    ret = Result.new(:UPS)
 
-    if details.status.strip.downcase == "delivered" then
-        ret.status = DELIVERED
+    ret.status = case details.status.strip.downcase
+        when "in transit"
+            IN_TRANSIT
+        when "delivered"
+            DELIVERED
+        else
+            UNKNOWN
     end
 
     hash = {}
@@ -56,8 +61,10 @@ def track(id)
         hash[k] = details.vals[i]
     end
 
-    delivered_at = cleanup_html( hash["Delivered On:"] )
-    ret.delivered_at = DateTime.strptime( delivered_at, "%A, %m/%d/%Y at %I:%M %p" ).to_time
+    if ret.status == DELIVERED then
+        delivered_at = cleanup_html( hash["Delivered On:"] )
+        ret.delivered_at = DateTime.strptime( delivered_at, "%A, %m/%d/%Y at %I:%M %p" ).to_time
+    end
 
     cleanup_html( details.lists[3] ) =~ /Updated: (.*?)$/
     ret.updated_at = DateTime.strptime( $1, "%m/%d/%Y %I:%M %p" ).to_time
