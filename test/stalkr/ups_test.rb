@@ -1,10 +1,8 @@
 require File.dirname(__FILE__) + '/../test_helper.rb'
 
-class Stalkr_Test < Test::Unit::TestCase
+class UPS_Test < Test::Unit::TestCase
 
-    # useless test is useless :)
     def test_track
-
         id = "1ZX799470341200708"
         info = Stalkr::UPS.new.track(id)
         assert(info.shipper == :UPS)
