@@ -1,5 +1,9 @@
 
-begin; require "rubygems"; require "turn"; rescue LoadError; end
+require "rubygems"
+
+if not ENV.include? "TM_MODE" then
+    begin; require "turn"; rescue LoadError; end
+end
 
 require 'stringio'
 require 'test/unit'
