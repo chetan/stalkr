@@ -7,7 +7,6 @@ end
 
 require 'scrapi'
 require 'htmlentities'
-require 'ostruct'
 require 'date'
 
 require 'stalkr/base'
