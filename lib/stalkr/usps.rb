@@ -1,11 +1,12 @@
 
-# http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum=9102901001312014825845
-
 module Stalkr
 
 class USPS < Base
 
     def track(id)
+
+        # cleanup id
+        id.gsub!(/ /, '')
 
         url = "http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum=%CODE%"
 
@@ -14,21 +15,49 @@ class USPS < Base
 
         info_scraper = Scraper.define do
 
-            process "td.mainText", :info => :text
+            array :details
+            array :info
 
-            result :info
+            process "span.mainTextbold", :info => :text
+            process "td.mainTextbold", :details => :text
+            process "td.mainText", :txt => :text
+
+            result :details, :info, :txt
 
         end
 
-        info = info_scraper.scrape(html)
+        scrape = info_scraper.scrape(html)
 
-        obj = OpenStruct.new(:shipper => 'USPS')
-        if info =~ /There is no record of this item/ then
-            obj.status = 'There is no record of this item'
+        # verify its the correct response page
+        if scrape.info[0].gsub(/ /, '') != id then
+            raise "USPS scraper failed"
         end
 
-        return obj
+        # extract and return
+        ret = Result.new(:USPS)
+        if scrape.txt =~ /There is no record of this item/ then
+            ret.status = UNKNOWN
+        elsif scrape.info[3].downcase == "delivered" then
+            ret.status = DELIVERED
+        else
+            ret.status = UNKNOWN
+        end
 
+        if scrape.details and not scrape.details.empty? then
+            if scrape.details[0] =~ /^(.*?), (.*? \d+, \d+), (\d+:\d+ .m), (.*?)$/ then
+                ret.location = $4
+                # not sure if this time is always in EST or the time of the area in which it was delivered?
+                ret.updated_at = DateTime.strptime( "#{$2} #{$3} -0500", "%B %d, %Y %I:%M %p %z" ).to_time
+                if ret.status == DELIVERED then
+                    ret.delivered_at = ret.updated_at
+                end
+
+            elsif scrape.details[0] =~ /Electronic Shipping Info Received/ then
+                ret.status = IN_TRANSIT
+            end
+        end
+
+        return ret
     end
 
 end # class USPS

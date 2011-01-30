@@ -7,7 +7,7 @@ module Stalkr
 
     class Result
 
-        attr_accessor :shipper, :status, :updated_at, :delivered_at
+        attr_accessor :shipper, :status, :updated_at, :delivered_at, :location
 
         def initialize(shipper)
             @shipper = shipper
