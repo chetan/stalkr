@@ -17,4 +17,9 @@ class USPS_Test < Test::Unit::TestCase
         assert(info.status == Stalkr::UNKNOWN)
     end
 
+    def test_extract_id
+        str = "asdf 9102901001299192824023 asdfas"
+        assert(Stalkr::USPS.extract_id(str) == "9102901001299192824023")
+    end
+
 end

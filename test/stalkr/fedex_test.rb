@@ -18,4 +18,9 @@ class FEDEX_Test < Test::Unit::TestCase
 
     end
 
+    def test_extract_id
+        str = "asdf 106050761498748 asdfas"
+        assert(Stalkr::FEDEX.extract_id(str) == "106050761498748")
+    end
+
 end

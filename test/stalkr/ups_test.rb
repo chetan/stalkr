@@ -37,7 +37,8 @@ class UPS_Test < Test::Unit::TestCase
     end
 
     def test_extract_id
-
+        str = "asdf 1ZX799470341200708 asdfas"
+        assert(Stalkr::UPS.extract_id(str) == "1ZX799470341200708")
     end
 
 end

@@ -6,9 +6,7 @@ module Stalkr
 
 class FEDEX < Base
 
-    def initialize
-        @regex = /\b((96\d\d\d\d\d ?\d\d\d\d|96\d\d) ?\d\d\d\d ?d\d\d\d( ?\d\d\d)?)|(\d{12}|\d{15})\b/i
-    end
+    self.regex = /\b((96\d\d\d\d\d ?\d\d\d\d|96\d\d) ?\d\d\d\d ?d\d\d\d( ?\d\d\d)?)|(\d{12}|\d{15})\b/i
 
     def track(id)
 

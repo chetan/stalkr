@@ -3,9 +3,8 @@ module Stalkr
 
 class USPS < Base
 
-    def initialize
-        @regex = /\b(91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4} ?\d{2}|91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4})\b/i
-    end
+    # 20 or 22 digits, beginning with 91 (and with or without spaces between groupings)
+    self.regex = /\b(91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4} ?\d{2}|91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4})\b/i
 
     def track(id)
 
