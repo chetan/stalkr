@@ -3,6 +3,10 @@ module Stalkr
 
 class USPS < Base
 
+    def initialize
+        @regex = /\b(91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4} ?\d{2}|91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4})\b/i
+    end
+
     def track(id)
 
         # cleanup id

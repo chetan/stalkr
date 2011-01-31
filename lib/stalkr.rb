@@ -31,6 +31,10 @@ end
 
 module Stalkr
 
+	def self.shippers
+		return [ Stalkr::UPS, Stalkr::USPS, Stalkr::FEDEX ]
+	end
+
     def self.track(id)
         shipper = nil
         if id =~ /\d{22}/ then

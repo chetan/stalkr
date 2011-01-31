@@ -24,4 +24,20 @@ class UPS_Test < Test::Unit::TestCase
 
     end
 
+    def test_valid_id
+        id = "1ZX799470341200708"
+        ret = Stalkr::UPS.is_valid?(id)
+        assert(ret)
+    end
+
+    def test_invalid_id
+        id = "1X799470341200708"
+        ret = Stalkr::UPS.is_valid?(id)
+        assert(!ret)
+    end
+
+    def test_extract_id
+
+    end
+
 end

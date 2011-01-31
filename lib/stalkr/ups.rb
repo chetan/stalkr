@@ -16,6 +16,8 @@ module Stalkr
 
 class UPS < Base
 
+    self.regex = /\b(1Z ?[0-9A-Z]{3} ?[0-9A-Z]{3} ?[0-9A-Z]{2} ?[0-9A-Z]{4} ?[0-9A-Z]{3} ?[0-9A-Z]|[\dT]\d{3} ?\d{4} ?\d{3})\b/i
+
 def track(id)
 
     url = "http://wwwapps.ups.com/WebTracking/processInputRequest?TypeOfInquiryNumber=T&loc=en_US&InquiryNumber1=%CODE%"
