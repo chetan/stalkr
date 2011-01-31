@@ -10,6 +10,14 @@ class USPS_Test < Test::Unit::TestCase
         assert(info.delivered_at.kind_of? Time)
     end
 
+    def test_older_pkg
+        id = "9102927003525018504915"
+        info = Stalkr::USPS.new.track(id)
+        assert(info.shipper == :USPS)
+        assert(info.status == Stalkr::DELIVERED)
+        assert(info.delivered_at.kind_of? Time)
+    end
+
     def test_track_bad_code
         id = "9102901001312014825845"
         info = Stalkr::USPS.new.track(id)

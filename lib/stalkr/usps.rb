@@ -20,6 +20,7 @@ class USPS < Base
 
             array :details
             array :info
+            array :txt
 
             process "span.mainTextbold", :info => :text
             process "td.mainTextbold", :details => :text
@@ -38,9 +39,9 @@ class USPS < Base
 
         # extract and return
         ret = Result.new(:USPS)
-        if scrape.txt =~ /There is no record of this item/ then
+        if scrape.txt.find{ |t| t =~ /There is no record of this item/ } then
             ret.status = UNKNOWN
-        elsif scrape.info[3].downcase == "delivered" then
+        elsif scrape.info.find{ |i| i.downcase == "delivered" } then
             ret.status = DELIVERED
         else
             ret.status = UNKNOWN
@@ -58,6 +59,16 @@ class USPS < Base
             elsif scrape.details[0] =~ /Electronic Shipping Info Received/ then
                 ret.status = IN_TRANSIT
             end
+
+        elsif s = scrape.txt.find{ |t| t =~ /files offline/ }
+            s =~ /at (\d+:\d+ .m) on (.*? \d+, \d+) in (.*?)\.$/
+            ret.location = $3
+            # not sure if this time is always in EST or the time of the area in which it was delivered?
+            ret.updated_at = DateTime.strptime( "#{$2} #{$1} -0500", "%B %d, %Y %I:%M %p %z" ).to_time
+            if ret.status == DELIVERED then
+                ret.delivered_at = ret.updated_at
+            end
+
         end
 
         return ret
