@@ -11,6 +11,8 @@ require 'date'
 
 require 'stalkr/base'
 require 'stalkr/result'
+require 'stalkr/error'
+
 require 'stalkr/ups'
 require 'stalkr/usps'
 require 'stalkr/fedex'

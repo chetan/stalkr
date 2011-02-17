@@ -25,53 +25,60 @@ class UPS < Base
         url.gsub!(/%CODE%/, id)
         html = fetchurl(url)
 
-        detail_scraper = Scraper.define do
+        begin
 
-            array :keys
-            array :vals
-            array :lists
+            detail_scraper = Scraper.define do
 
-            process "#trkNum", :trackingNumber => :text
-            process "#tt_spStatus", :status => :text
-            process "#fontControl dt", :keys => :text
-            process "#fontControl dd", :vals => :text
-            process "#fontControl ul.clearfix li", :lists => :text
+                array :keys
+                array :vals
+                array :lists
 
-            result :keys, :vals, :trackingNumber, :status, :lists
+                process "#trkNum", :trackingNumber => :text
+                process "#tt_spStatus", :status => :text
+                process "#fontControl dt", :keys => :text
+                process "#fontControl dd", :vals => :text
+                process "#fontControl ul.clearfix li", :lists => :text
+
+                result :keys, :vals, :trackingNumber, :status, :lists
+
+            end
+
+            details = detail_scraper.scrape(html)
+
+            if not details.trackingNumber then
+                raise "UPS scraper failed"
+            end
+
+            ret = Result.new(:UPS)
+
+            ret.status = case details.status.strip.downcase
+                when "in transit"
+                    IN_TRANSIT
+                when "delivered"
+                    DELIVERED
+                else
+                    UNKNOWN
+            end
+
+            hash = {}
+            details.keys.each_with_index do |k,i|
+                hash[k] = details.vals[i]
+            end
+
+            if ret.status == DELIVERED then
+                delivered_at = cleanup_html( hash["Delivered On:"] )
+                ret.delivered_at = DateTime.strptime( delivered_at, "%A, %m/%d/%Y at %I:%M %p" ).to_time
+            end
+
+            cleanup_html( details.lists[3] ) =~ /Updated: (.*?)$/
+            ret.updated_at = DateTime.strptime( $1, "%m/%d/%Y %I:%M %p" ).to_time
+
+            return ret
+
+        rescue Exception => ex
+            raise Stalkr::Error.new(ex, html)
 
         end
-
-        details = detail_scraper.scrape(html)
-
-        if not details.trackingNumber then
-            raise "UPS scraper failed"
-        end
-
-        ret = Result.new(:UPS)
-
-        ret.status = case details.status.strip.downcase
-            when "in transit"
-                IN_TRANSIT
-            when "delivered"
-                DELIVERED
-            else
-                UNKNOWN
-        end
-
-        hash = {}
-        details.keys.each_with_index do |k,i|
-            hash[k] = details.vals[i]
-        end
-
-        if ret.status == DELIVERED then
-            delivered_at = cleanup_html( hash["Delivered On:"] )
-            ret.delivered_at = DateTime.strptime( delivered_at, "%A, %m/%d/%Y at %I:%M %p" ).to_time
-        end
-
-        cleanup_html( details.lists[3] ) =~ /Updated: (.*?)$/
-        ret.updated_at = DateTime.strptime( $1, "%m/%d/%Y %I:%M %p" ).to_time
-
-        return ret
 
     end
 

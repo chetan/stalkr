@@ -16,62 +16,70 @@ class USPS < Base
         url.gsub!(/%CODE%/, id)
         html = fetchurl(url)
 
-        info_scraper = Scraper.define do
+        begin
 
-            array :details
-            array :info
-            array :txt
+            info_scraper = Scraper.define do
 
-            process "span.mainTextbold", :info => :text
-            process "td.mainTextbold", :details => :text
-            process "td.mainText", :txt => :text
+                array :details
+                array :info
+                array :txt
 
-            result :details, :info, :txt
+                process "span.mainTextbold", :info => :text
+                process "td.mainTextbold", :details => :text
+                process "td.mainText", :txt => :text
 
-        end
+                result :details, :info, :txt
 
-        scrape = info_scraper.scrape(html)
+            end
 
-        # verify its the correct response page
-        if scrape.info[0].gsub(/ /, '') != id then
-            raise "USPS scraper failed"
-        end
+            scrape = info_scraper.scrape(html)
 
-        # extract and return
-        ret = Result.new(:USPS)
-        if scrape.txt.find{ |t| t =~ /There is no record of this item/ } then
-            ret.status = UNKNOWN
-        elsif scrape.info.find{ |i| i.downcase == "delivered" } then
-            ret.status = DELIVERED
-        else
-            ret.status = UNKNOWN
-        end
+            # verify its the correct response page
+            if scrape.info[0].gsub(/ /, '') != id then
+                raise "USPS scraper failed"
+            end
 
-        if scrape.details and not scrape.details.empty? then
-            if scrape.details[0] =~ /^(.*?), (.*? \d+, \d+), (\d+:\d+ .m), (.*?)$/ then
-                ret.location = $4
+            # extract and return
+            ret = Result.new(:USPS)
+            if scrape.txt.find{ |t| t =~ /There is no record of this item/ } then
+                ret.status = UNKNOWN
+            elsif scrape.info.find{ |i| i.downcase == "delivered" } then
+                ret.status = DELIVERED
+            else
+                ret.status = UNKNOWN
+            end
+
+            if scrape.details and not scrape.details.empty? then
+                if scrape.details[0] =~ /^(.*?), (.*? \d+, \d+), (\d+:\d+ .m), (.*?)$/ then
+                    ret.location = $4
+                    # not sure if this time is always in EST or the time of the area in which it was delivered?
+                    ret.updated_at = DateTime.strptime( "#{$2} #{$3} -0500", "%B %d, %Y %I:%M %p %z" ).to_time
+                    if ret.status == DELIVERED then
+                        ret.delivered_at = ret.updated_at
+                    end
+
+                elsif scrape.details[0] =~ /Electronic Shipping Info Received/ then
+                    ret.status = IN_TRANSIT
+                end
+
+            elsif s = scrape.txt.find{ |t| t =~ /files offline/ }
+                s =~ /at (\d+:\d+ .m) on (.*? \d+, \d+) in (.*?)\.$/
+                ret.location = $3
                 # not sure if this time is always in EST or the time of the area in which it was delivered?
-                ret.updated_at = DateTime.strptime( "#{$2} #{$3} -0500", "%B %d, %Y %I:%M %p %z" ).to_time
+                ret.updated_at = DateTime.strptime( "#{$2} #{$1} -0500", "%B %d, %Y %I:%M %p %z" ).to_time
                 if ret.status == DELIVERED then
                     ret.delivered_at = ret.updated_at
                 end
 
-            elsif scrape.details[0] =~ /Electronic Shipping Info Received/ then
-                ret.status = IN_TRANSIT
             end
 
-        elsif s = scrape.txt.find{ |t| t =~ /files offline/ }
-            s =~ /at (\d+:\d+ .m) on (.*? \d+, \d+) in (.*?)\.$/
-            ret.location = $3
-            # not sure if this time is always in EST or the time of the area in which it was delivered?
-            ret.updated_at = DateTime.strptime( "#{$2} #{$1} -0500", "%B %d, %Y %I:%M %p %z" ).to_time
-            if ret.status == DELIVERED then
-                ret.delivered_at = ret.updated_at
-            end
+            return ret
+
+        rescue Exception => ex
+            raise Stalkr::Error.new(ex, html)
 
         end
 
-        return ret
     end
 
 end # class USPS
