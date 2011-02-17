@@ -3,8 +3,10 @@ module Stalkr
 
 class USPS < Base
 
-    # 20 or 22 digits, beginning with 91 (and with or without spaces between groupings)
-    self.regex = /\b(91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4} ?\d{2}|91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4})\b/i
+    # 1) 20 or 22 digits, beginning with 91 (and with or without spaces between groupings)
+    # 2) 20 digits (no real pattern)
+    # TODO: 2nd pattern is too generic. Could also match other carriers.
+    self.regex = /\b(91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4} ?\d{2}|91\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4})\b|\b(\d{20})\b/i
 
     def track(id)
 
