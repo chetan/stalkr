@@ -37,4 +37,10 @@ class FEDEX_Test < Test::Unit::TestCase
         assert(Stalkr::FEDEX.extract_id(str) == "106050761498748")
     end
 
+    def test_should_not_extract
+        str = "Your tracking number is: 02185456301085740874. "
+        id = Stalkr::FEDEX.extract_id(str)
+        assert(id.nil?)
+    end
+
 end
