@@ -20,20 +20,20 @@ if not DateTime.new.public_methods.include? "to_time" then
     class DateTime
         def to_time
           d = new_offset(0)
-          d.instance_eval do
+          t = d.instance_eval do
             Time.utc(year, mon, mday, hour, min, sec +
                      sec_fraction)
-          end.
-              getlocal
+          end
+          t.getlocal
         end
     end
 end
 
 module Stalkr
 
-	def self.shippers
-		return [ Stalkr::UPS, Stalkr::USPS, Stalkr::FEDEX ]
-	end
+    def self.shippers
+        return [ Stalkr::UPS, Stalkr::USPS, Stalkr::FEDEX ]
+    end
 
     def self.track(id)
         shipper = nil
