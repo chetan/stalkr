@@ -7,8 +7,14 @@ module Stalkr
             attr_accessor :regex
         end
 
-        def fetchurl(url)
-            return Net::HTTP.get_response(URI.parse(URI.escape(url))).body
+        def fetchurl(url, data = nil)
+            url = URI.parse(URI.escape(url))
+            if data.nil? then
+                # GET request
+                return Net::HTTP.get_response(url).body
+            else
+                return Net::HTTP.post_form(url, data).body
+            end
         end
 
         def strip_tags(html)

@@ -9,13 +9,16 @@ require 'scrapi'
 require 'htmlentities'
 require 'date'
 
-require 'stalkr/base'
-require 'stalkr/result'
-require 'stalkr/error'
 
-require 'stalkr/ups'
-require 'stalkr/usps'
-require 'stalkr/fedex'
+stalkr_dir = File.dirname(__FILE__)
+require "#{stalkr_dir}/stalkr/base"
+require "#{stalkr_dir}/stalkr/result"
+require "#{stalkr_dir}/stalkr/error"
+
+require "#{stalkr_dir}/stalkr/ups"
+require "#{stalkr_dir}/stalkr/usps"
+require "#{stalkr_dir}/stalkr/fedex"
+require "#{stalkr_dir}/stalkr/china_post"
 
 if not DateTime.new.public_methods.include? "to_time" then
     # monkey patch DateTime to add to_time (exists in Ruby 1.9.2 and above)
