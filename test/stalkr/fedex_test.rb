@@ -10,6 +10,13 @@ class FEDEX_Test < Test::Unit::TestCase
         assert(info.delivered_at.kind_of? Time)
     end
 
+    def test_track_in_transit
+        id = "005794539515313"
+        info = Stalkr::FEDEX.new.track(id)
+        assert(info.shipper == :FEDEX)
+        assert(info.status == Stalkr::IN_TRANSIT)
+    end
+
     def test_track_bad_code
 
         id = "foobar"

@@ -40,8 +40,13 @@ class FEDEX < Base
 
             info = info_scraper.scrape(html)
 
-            if info.status.strip.downcase == "delivered" then
+            status = info.status.strip.downcase
+            if status == "delivered" then
                 ret.status = DELIVERED
+            elsif status == "on schedule" then
+                ret.status = IN_TRANSIT
+            else
+                ret.status = UNKNOWN
             end
             ret.location = info.destination.strip
 
@@ -52,7 +57,9 @@ class FEDEX < Base
             delivery_date = info.dates[1].strip if info.dates.length == 2
             if shipped_date.empty? then
                 shipped_date = DateTime.strptime( $1, "%b %d, %Y" ).to_time if html =~ /var shipDate = "(.*?);$"/
-                delivery_date = DateTime.strptime( "#{$1} -5", "%b %d, %Y %I:%M %p %z" ).to_time if html =~ /var deliveryDateTime = "(.*?)";$/
+                if html =~ /var deliveryDateTime = "(.*?)";$/ and not ($1.nil? or $1.strip.empty?) then
+                    delivery_date = DateTime.strptime( "#{$1} -5", "%b %d, %Y %I:%M %p %z" ).to_time
+                end
             end
             ret.delivered_at = delivery_date
             ret.updated_at = delivery_date
