@@ -39,7 +39,6 @@ class ChinaPost < Base
             rows.shift
 
             status = rows.first[2].strip.downcase
-            puts status
             if status =~ /delivered/ then
                 ret.status = DELIVERED
             elsif status =~ /arrival|departure/ then
