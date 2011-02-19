@@ -18,6 +18,7 @@ require "#{stalkr_dir}/stalkr/error"
 require "#{stalkr_dir}/stalkr/ups"
 require "#{stalkr_dir}/stalkr/usps"
 require "#{stalkr_dir}/stalkr/fedex"
+require "#{stalkr_dir}/stalkr/dhl"
 require "#{stalkr_dir}/stalkr/china_post"
 
 if not DateTime.new.public_methods.include? "to_time" then
