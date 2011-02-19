@@ -39,11 +39,17 @@ module Stalkr
         end
 
         def self.extract_id(str)
-            if str =~ regex() then
-                # return the first non-nil backreference
-                m = $~.to_a
-                m.shift
-                return m.find{ |s| not s.nil? }.gsub(/ /, '').upcase
+            r = regex()
+            if r.kind_of? Regexp then
+                r = [ r ]
+            end
+            r.each do |re|
+                if str =~ re then
+                    # return the first non-nil backreference
+                    m = $~.to_a
+                    m.shift
+                    return m.find{ |s| not s.nil? }.gsub(/ /, '').upcase
+                end
             end
             return nil
         end
