@@ -40,4 +40,9 @@ class USPS_Test < Test::Unit::TestCase
         assert(Stalkr::USPS.extract_id(str) == "9400110200793331353367")
     end
 
+    def test_extract_id_4
+        str = "Your tracking number is: LJ337239295US. "
+        assert(Stalkr::USPS.extract_id(str) == "LJ337239295US")
+    end
+
 end
