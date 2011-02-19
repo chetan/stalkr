@@ -7,19 +7,6 @@ module Stalkr
         return @@shippers
     end
 
-    def self.track(id)
-        shipper = nil
-        if id =~ /\d{22}/ then
-            shipper = Stalkr::USPS
-        elsif id =~ /^1Z/ then
-            shipper = Stalkr::UPS
-        elsif id =~ /\d{20}/ or id =~ /\d{15}/ then
-            shipper = Stalkr::FEDEX
-        end
-        raise 'Unknown shipper code' if shipper.nil?
-        return shipper.new.track(id)
-    end
-
     class Base
 
         class << self
