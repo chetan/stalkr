@@ -7,6 +7,14 @@ module Stalkr
         return @@shippers
     end
 
+    def self.detect_shipper(text)
+        Stalkr.shippers.each do |s|
+            id = s.extract_id(text)
+            return [id, s] if id
+        end
+        return nil
+    end
+
     class Base
 
         class << self
