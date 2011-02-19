@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../test_helper.rb'
 class USPS_Test < Test::Unit::TestCase
 
     def test_track
-        id = "9102901001299192824023"
+        id = "9400110200793331353367"
         info = Stalkr::USPS.new.track(id)
         assert(info.shipper == :USPS)
         assert(info.status == Stalkr::DELIVERED)
@@ -32,8 +32,12 @@ class USPS_Test < Test::Unit::TestCase
 
     def test_extract_id_2
         str = "Your tracking number is: 02185456301085740874. "
-        id = Stalkr::USPS.extract_id(str)
-        assert(!id.nil? && id == "02185456301085740874")
+        assert(Stalkr::USPS.extract_id(str) == "02185456301085740874")
+    end
+
+    def test_extract_id_3
+        str = "Your tracking number is: 9400110200793331353367. "
+        assert(Stalkr::USPS.extract_id(str) == "9400110200793331353367")
     end
 
 end
