@@ -86,3 +86,5 @@ class UPS < Base
 
 end # class UPS
 end # module Stalkr
+
+Stalkr.shippers << Stalkr::UPS

@@ -70,3 +70,5 @@ class DHL < Base
 
 end # class ChinaPost
 end # module Stalkr
+
+Stalkr.shippers << Stalkr::DHL

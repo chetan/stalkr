@@ -1,8 +1,10 @@
 
 module Stalkr
 
+    @@shippers = []
+
     def self.shippers
-        return [ Stalkr::UPS, Stalkr::USPS, Stalkr::FEDEX ]
+        return @@shippers
     end
 
     def self.track(id)

@@ -2,6 +2,10 @@ require File.dirname(__FILE__) + '/../test_helper.rb'
 
 class DHL_Test < Test::Unit::TestCase
 
+    def test_has_shipper
+        assert(Stalkr.shippers.include? Stalkr::DHL)
+    end
+
     def test_track
         id = "5391587692"
         info = Stalkr::DHL.new.track(id)

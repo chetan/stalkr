@@ -2,6 +2,10 @@ require File.dirname(__FILE__) + '/../test_helper.rb'
 
 class ChinaPost_Test < Test::Unit::TestCase
 
+    def test_has_shipper
+        assert(Stalkr.shippers.include? Stalkr::ChinaPost)
+    end
+
     def test_track
         id = "RA103044224CN"
         info = Stalkr::ChinaPost.new.track(id)

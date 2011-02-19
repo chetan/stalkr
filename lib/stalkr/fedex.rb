@@ -77,3 +77,5 @@ class FEDEX < Base
 
 end # class FEDEX
 end # module Stalkr
+
+Stalkr.shippers << Stalkr::FEDEX

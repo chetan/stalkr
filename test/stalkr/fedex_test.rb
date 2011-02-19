@@ -2,6 +2,10 @@ require File.dirname(__FILE__) + '/../test_helper.rb'
 
 class FEDEX_Test < Test::Unit::TestCase
 
+    def test_has_shipper
+        assert(Stalkr.shippers.include? Stalkr::FEDEX)
+    end
+
     def test_track
         id = "106050761498748"
         info = Stalkr::FEDEX.new.track(id)

@@ -65,3 +65,5 @@ class ChinaPost < Base
 
 end # class ChinaPost
 end # module Stalkr
+
+Stalkr.shippers << Stalkr::ChinaPost

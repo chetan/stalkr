@@ -93,3 +93,5 @@ class USPS < Base
 
 end # class USPS
 end # module Stalkr
+
+Stalkr.shippers << Stalkr::USPS
