@@ -9,6 +9,7 @@ begin
     gemspec.email = "chetan@pixelcop.net"
     gemspec.homepage = "http://github.com/chetan/stalkr"
     gemspec.authors = ["Chetan Sarva"]
+    gemspec.add_dependency('curb', '>= 0.7.10')
     gemspec.add_dependency('scrapi', '= 1.2.0')
     gemspec.add_dependency('tzinfo', '>= 0.3.15')
     gemspec.add_dependency('json', '>= 1.4.6')

@@ -22,12 +22,12 @@ module Stalkr
         end
 
         def fetchurl(url, data = nil)
-            url = URI.parse(URI.escape(url))
             if data.nil? then
-                # GET request
-                return Net::HTTP.get_response(url).body
+                # GET
+                return Curl::Easy.perform(url).body_str
             else
-                return Net::HTTP.post_form(url, data).body
+                # POST
+                return Curl::Easy.http_post(url, data.map{ |k,v| Curl::PostField.content(k, v) }).body_str
             end
         end
 

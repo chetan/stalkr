@@ -5,6 +5,7 @@ if RUBY_PLATFORM =~ /darwin/ then
     Tidy.path = "/usr/lib/libtidy.dylib"
 end
 
+require 'curb'
 require 'scrapi'
 require 'htmlentities'
 require 'date'
@@ -21,6 +22,3 @@ require "#{stalkr_dir}/stalkr/usps"
 require "#{stalkr_dir}/stalkr/fedex"
 require "#{stalkr_dir}/stalkr/dhl"
 require "#{stalkr_dir}/stalkr/china_post"
-
-
-
