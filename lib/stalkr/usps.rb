@@ -25,6 +25,12 @@ class USPS < Base
         url.gsub!(/%CODE%/, id)
         html = fetchurl(url)
 
+        if html =~ /Track &amp; Confirm is temporarily unavailable/ then
+            ret = Result.new(:USPS)
+            ret.status = UNKNOWN
+            return ret
+        end
+
         begin
 
             info_scraper = Scraper.define do
